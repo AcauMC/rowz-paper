@@ -130,9 +130,6 @@ main() {
             echo "No changes found for PR #${pr_number}"
         fi
 
-        # Remove temp dir
-        rm -rf "$work_dir"
-
     done < "$PR_LIST_FILE"
 
     echo "Update process complete. Copy paste the contents of the output/pr-x/changes.patch file, then open IntelliJ and use the 'Apply Patch From Clipboard' action (you can search for it via Ctrl+Shift+A). Resolve conflicts and make sure everything applied correctly."
