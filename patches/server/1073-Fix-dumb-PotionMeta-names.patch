@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nassim Jahnke <nassim@njahnke.dev>
+Date: Mon, 23 Dec 2024 19:52:31 +0100
+Subject: [PATCH] Fix dumb PotionMeta names
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaPotion.java b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaPotion.java
+index 49690dab508b07f9f56b2fb21eeb5f20172b5bd3..8cdb91a81de7c67ec6d27efabd5bcef4dd8ac169 100644
+--- a/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaPotion.java
++++ b/src/main/java/org/bukkit/craftbukkit/inventory/CraftMetaPotion.java
+@@ -306,17 +306,17 @@ class CraftMetaPotion extends CraftMetaItem implements PotionMeta {
+     }
+ 
+     @Override
+-    public boolean hasCustomName() {
++    public boolean hasCustomPotionName() { // Paper
+         return this.customName != null;
+     }
+ 
+     @Override
+-    public String getCustomName() {
++    public String getCustomPotionName() { // Paper
+         return this.customName;
+     }
+ 
+     @Override
+-    public void setCustomName(String customName) {
++    public void setCustomPotionName(String customName) { // Paper
+         Preconditions.checkArgument(customName == null || customName.length() <= 32767, "Custom name is longer than 32767 characters");
+         this.customName = customName;
+     }

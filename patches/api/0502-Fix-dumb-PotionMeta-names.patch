@@ -1,0 +1,84 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Nassim Jahnke <nassim@njahnke.dev>
+Date: Mon, 23 Dec 2024 19:53:19 +0100
+Subject: [PATCH] Fix dumb PotionMeta names
+
+
+diff --git a/src/main/java/org/bukkit/inventory/meta/PotionMeta.java b/src/main/java/org/bukkit/inventory/meta/PotionMeta.java
+index b61d2e322f80fcabae5e286cba8df9701ebcf5ea..355257ae899dc5d90965295ecb8cf8fe888ce9f0 100644
+--- a/src/main/java/org/bukkit/inventory/meta/PotionMeta.java
++++ b/src/main/java/org/bukkit/inventory/meta/PotionMeta.java
+@@ -146,30 +146,69 @@ public interface PotionMeta extends ItemMeta {
+      */
+     void setColor(@Nullable Color color);
+ 
++    // Paper start - fix dumb names
+     /**
+      * Checks for existence of a custom potion name translation suffix.
+      *
++     * @deprecated conflicting name, use {@link #hasCustomPotionName()}
+      * @return true if this has a custom potion name
+      */
+-    boolean hasCustomName();
++    @Deprecated(forRemoval = true)
++    default boolean hasCustomName() {
++        return this.hasCustomPotionName();
++    }
+ 
+     /**
+      * Gets the potion name translation suffix that is set.
+      * <p>
+-     * Plugins should check that hasCustomName() returns <code>true</code>
++     * Plugins should check that {@link #hasCustomPotionName()} returns {@code true}
+      * before calling this method.
+      *
++     * @deprecated conflicting name, use {@link #getCustomPotionName()}
+      * @return the potion name that is set
+      */
++    @Deprecated(forRemoval = true)
+     @Nullable
+-    String getCustomName();
++    default String getCustomName() {
++        return this.getCustomPotionName();
++    }
+ 
+     /**
+      * Sets the potion name translation suffix.
+      *
++     * @deprecated conflicting name, use {@link #setCustomPotionName(String)}
+      * @param name the name to set
+      */
+-    void setCustomName(@Nullable String name);
++    @Deprecated(forRemoval = true)
++    default void setCustomName(@Nullable String name) {
++        this.setCustomPotionName(name);
++    }
++
++    /**
++     * Checks for existence of a custom potion name translation suffix.
++     *
++     * @return true if this has a custom potion name
++     */
++    boolean hasCustomPotionName();
++
++    /**
++     * Gets the potion name translation suffix that is set.
++     * <p>
++     * Plugins should check that {@link #hasCustomPotionName()} returns {@code true}
++     * before calling this method.
++     *
++     * @return the potion name that is set
++     */
++    @Nullable
++    String getCustomPotionName();
++
++    /**
++     * Sets the potion name translation suffix.
++     *
++     * @param name the name to set
++     */
++    void setCustomPotionName(@Nullable String name);
++    // Paper end - fix dumb names
+ 
+     @Override
+     PotionMeta clone();
