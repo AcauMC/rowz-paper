@@ -22216,7 +22216,7 @@ index 0000000000000000000000000000000000000000..85950a1aa732ab8c01ad28bec9e0de14
 +    }
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 450a1cc8f1624dce2daf52210d017e0732b1bdf7..a9dd0e5216e95afd98fd2200d110e2cc0b1b0dca 100644
+index 2e7210ebde1ad6cba96300b51b92b426ef99b31e..ad06cb6437f10e8592f39681cc490121590e5a38 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 @@ -31,6 +31,45 @@ public class GlobalConfiguration extends ConfigurationPart {
@@ -22287,7 +22287,7 @@ index 450a1cc8f1624dce2daf52210d017e0732b1bdf7..a9dd0e5216e95afd98fd2200d110e2cc
      public UnsupportedSettings unsupportedSettings;
  
      public class UnsupportedSettings extends ConfigurationPart {
-@@ -219,7 +243,7 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -221,7 +245,7 @@ public class GlobalConfiguration extends ConfigurationPart {
  
          @PostProcess
          private void postProcess() {
