@@ -22,10 +22,10 @@ is actually processed, this is honestly really just exposed for the misnomers or
 who just wanna ensure that this won't grow over a specific size if chat gets stupidly active
 
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-index 2eb155d3df2e34c050fd28c5a64015e6e1232851..d8db428f06606c16466d39cceb2a5e02eb3d3b24 100644
+index 520c24a5da75880030e07b72affac41fc2ad2ad5..5ce5fe7642c5fba873f5a74beb4c4e242824febd 100644
 --- a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -300,7 +300,18 @@ public class GlobalConfiguration extends ConfigurationPart {
+@@ -302,7 +302,18 @@ public class GlobalConfiguration extends ConfigurationPart {
  
              @PostProcess
              private void postProcess() {

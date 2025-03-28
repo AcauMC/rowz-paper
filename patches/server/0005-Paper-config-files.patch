@@ -485,10 +485,10 @@ index 0000000000000000000000000000000000000000..007e01d329a31acf7f4ed4c6dc4de7ad
 +}
 diff --git a/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..87da4ff63294735bfcbfa8442fb8ae7196b0f197
+index 0000000000000000000000000000000000000000..ce1dbeb20ebeadaae565ebfeb8dd15d66a4a417a
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/configuration/GlobalConfiguration.java
-@@ -0,0 +1,328 @@
+@@ -0,0 +1,330 @@
 +package io.papermc.paper.configuration;
 +
 +import com.mojang.logging.LogUtils;
@@ -666,6 +666,8 @@ index 0000000000000000000000000000000000000000..87da4ff63294735bfcbfa8442fb8ae71
 +        public boolean skipVanillaDamageTickWhenShieldBlocked = false;
 +        @Comment("This setting controls what compression format is used for region files.")
 +        public CompressionFormat compressionFormat = CompressionFormat.ZLIB;
++        @Comment("Only checks an item's amount and type instead of its full data during inventory desync checks.")
++        public boolean simplifyRemoteItemMatching = false;
 +
 +        public enum CompressionFormat {
 +            GZIP,
