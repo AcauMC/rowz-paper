@@ -1,0 +1,125 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: aperso <aperso@aperso.dev>
+Date: Sun, 1 Jun 2025 02:05:07 +0900
+Subject: [PATCH] implemented per user damage cooldown for entities
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 2aa6374cd4a96efd85899be8cd3172a8257bfe6b..94a8128ea5c033f9b06296c6d3f975cae31effd3 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -16,6 +16,7 @@ import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
+ import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
+ import java.util.Collection;
+ import java.util.ConcurrentModificationException;
++import java.util.HashMap;
+ import java.util.Iterator;
+ import java.util.List;
+ import java.util.Map;
+@@ -75,6 +76,7 @@ import net.minecraft.world.InteractionHand;
+ import net.minecraft.world.damagesource.CombatRules;
+ import net.minecraft.world.damagesource.CombatTracker;
+ import net.minecraft.world.damagesource.DamageSource;
++import net.minecraft.world.damagesource.DamageType;
+ import net.minecraft.world.damagesource.DamageTypes;
+ import net.minecraft.world.effect.MobEffect;
+ import net.minecraft.world.effect.MobEffectInstance;
+@@ -517,6 +519,10 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             --this.invulnerableTime;
+         }
+ 
++        for (Map.Entry<Integer, Integer> entry : invulnerableTimePerSource.entrySet()) {
++            entry.setValue(Math.max(0, entry.getValue() - 1));
++        }
++
+         if (this.isDeadOrDying() && this.level().shouldTickDeath(this)) {
+             this.tickDeath();
+         }
+@@ -1409,6 +1415,9 @@ public abstract class LivingEntity extends Entity implements Attackable {
+         return this.getHealth() <= 0.0F;
+     }
+ 
++    public Map<Integer, Integer> invulnerableTimePerSource = new HashMap<>();
++    public Map<Integer, Float> lastHurtPerSource = new HashMap<>();
++
+     @Override
+     public boolean hurt(DamageSource source, float amount) {
+         if (this.isInvulnerableTo(source)) {
+@@ -1465,9 +1474,23 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             this.walkAnimation.setSpeed(1.5F);
+             boolean flag1 = true;
+ 
+-            if ((float) this.invulnerableTime > (float) this.invulnerableDuration / 2.0F && !source.is(DamageTypeTags.BYPASSES_COOLDOWN)) { // CraftBukkit - restore use of maxNoDamageTicks
+-                if (amount <= this.lastHurt) {
+-                    return false;
++            Integer sourcePlayer = null;
++            if (source.is(DamageTypes.PLAYER_ATTACK) && source.getEntity() instanceof Entity sourceEntity) {
++                sourcePlayer = sourceEntity.getId();
++            }
++
++            if (
++                source.type().exhaustion() > 0 && (float) this.invulnerableTime > (float) this.invulnerableDuration / 2F &&
++                sourcePlayer == null || (float) invulnerableTimePerSource.computeIfAbsent(sourcePlayer, ignored -> 0) > (float) invulnerableDuration / 2F
++            ) { // CraftBukkit - restore use of maxNoDamageTicks
++                if (sourcePlayer != null) {
++                    if (amount <= lastHurtPerSource.computeIfAbsent(sourcePlayer, ignored -> 0F)) {
++                        return false;
++                    }
++                } else {
++                    if (amount <= lastHurt) {
++                        return false;
++                    }
+                 }
+ 
+                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
+@@ -1476,12 +1499,23 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                 // Paper end - only call damage event when actuallyHurt will be called - move call logic down
+ 
+                 // CraftBukkit start
+-                if (!this.actuallyHurt(source, (float) event.getFinalDamage() - this.lastHurt, event)) {
+-                    return false;
++                if (sourcePlayer != null) {
++                    System.out.println(event.getFinalDamage() - lastHurtPerSource.computeIfAbsent(sourcePlayer, ignored -> 0F));
++                    if (!this.actuallyHurt(source, (float) event.getFinalDamage() - lastHurtPerSource.computeIfAbsent(sourcePlayer, ignored -> 0F), event)) {
++                        return false;
++                    }
++                } else {
++                    if (!this.actuallyHurt(source, (float) event.getFinalDamage() - lastHurt, event)) {
++                        return false;
++                    }
+                 }
+                 if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
+                 // CraftBukkit end
+-                this.lastHurt = amount;
++                if (sourcePlayer != null) {
++                    lastHurtPerSource.put(sourcePlayer, amount);
++                } else {
++                    lastHurt = amount;
++                }
+                 flag1 = false;
+             } else {
+                 // Paper start - only call damage event when actuallyHurt will be called - move call logic down
+@@ -1493,8 +1527,13 @@ public abstract class LivingEntity extends Entity implements Attackable {
+                     return false;
+                 }
+                 if (this instanceof ServerPlayer && event.getDamage() == 0 && originalAmount == 0) return false; // Paper - revert to vanilla damage - players are not affected by damage that is 0 - skip damage if the vanilla damage is 0 and was not modified by plugins in the event.
+-                this.lastHurt = amount;
+-                this.invulnerableTime = this.invulnerableDuration; // CraftBukkit - restore use of maxNoDamageTicks
++                if (sourcePlayer != null) {
++                    lastHurtPerSource.put(sourcePlayer, amount);
++                    invulnerableTimePerSource.put(sourcePlayer, invulnerableDuration); // CraftBukkit - restore use of maxNoDamageTicks
++                } else {
++                    lastHurt = amount;
++                    invulnerableTime = invulnerableDuration;
++                }
+                 // this.actuallyHurt(damagesource, f);
+                 // CraftBukkit end
+                 this.hurtDuration = 10;
+@@ -3238,7 +3277,6 @@ public abstract class LivingEntity extends Entity implements Attackable {
+             this.appliedScale = f4;
+             this.refreshDimensions();
+         }
+-
+     }
+ 
+     public void detectEquipmentUpdatesPublic() { // CraftBukkit
