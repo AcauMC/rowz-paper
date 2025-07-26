@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: aperso <aperso@aperso.dev>
+Date: Sat, 26 Jul 2025 18:17:03 +0900
+Subject: [PATCH] increased beacon destroy time to 10
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/BeaconBlock.java b/src/main/java/net/minecraft/world/level/block/BeaconBlock.java
+index 56793f1ce1a4b919b5066966abf1768bf64540c8..b664e627f2bc8cc72d07ca474eb496c76f7aab09 100644
+--- a/src/main/java/net/minecraft/world/level/block/BeaconBlock.java
++++ b/src/main/java/net/minecraft/world/level/block/BeaconBlock.java
+@@ -25,7 +25,7 @@ public class BeaconBlock extends BaseEntityBlock implements BeaconBeamBlock {
+     }
+ 
+     public BeaconBlock(BlockBehaviour.Properties settings) {
+-        super(settings);
++        super(settings.destroyTime(10));
+     }
+ 
+     @Override
